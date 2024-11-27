@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Esto es cosa nuestra</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #000; /* Fondo negro */
+      color: #fff; /* Texto blanco */
+      font-family: 'Courier New', Courier, monospace; /* Fuente estilo máquina */
+      flex-direction: column;
+    }
+
+    #text {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+      white-space: nowrap; /* Evita que el texto se divida en líneas */
+      overflow: hidden; /* Oculta el texto sobrante */
+      border-right: 2px solid #ffcc00; /* Cursor tipo máquina */
+      animation: blink 0.5s step-end infinite; /* Parpadeo del cursor */
+    }
+
+    @keyframes blink {
+      from { border-color: #ffcc00; }
+      to { border-color: transparent; }
+    }
+
+    canvas {
+      background-color: #000;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="text"></div>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Ajustamos el tamaño del canvas
+    canvas.width = window.innerWidth * 0.9;
+    canvas.height = window.innerHeight * 0.9;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    let petalIndex = 0;
+    const petalCount = 20; // Número de pétalos
+    const petalLength = Math.min(canvas.width, canvas.height) / 3; // Tamaño grande para los pétalos
+
+    // Función para dibujar un pétalo
+    function drawPetal(x, y, length, angle, progress) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      const endX = length * progress;
+      const endY = length / 2 * progress;
+      ctx.quadraticCurveTo(length / 2, -length / 2, endX, endY); // Pétalo más grande
+      ctx.quadraticCurveTo(length / 2, length / 2, 0, 0); // Pétalo más grande
+      ctx.strokeStyle = '#ffcc00'; // Color dorado
+      ctx.lineWidth = 1; // Línea fina
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Función para dibujar el centro del girasol
+    function drawCenter() {
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 20, 0, Math.PI * 2); // Centro pequeño
+      ctx.fillStyle = '#ffcc00';
+      ctx.fill();
+    }
+
+    // Función para animar el girasol
+    function animateSunflower() {
+      const petalSpacing = (Math.PI * 2) / petalCount;
+
+      if (petalIndex < petalCount) {
+        let progress = 0; // Progreso inicial del trazo
+        const interval = setInterval(() => {
+          if (progress < 1) {
+            drawPetal(centerX, centerY, petalLength, petalIndex * petalSpacing, progress);
+            progress += 0.05; // Incrementar el progreso
+          } else {
+            clearInterval(interval); // Detener el intervalo cuando se dibuja el pétalo completo
+            petalIndex++;
+            if (petalIndex < petalCount) {
+              animateSunflower(); // Llamar recursivamente para el siguiente pétalo
+            } else {
+              drawCenter(); // Dibujar el centro del girasol después de los pétalos
+            }
+          }
+        }, 30); // Acelera el dibujo del pétalo
+      }
+    }
+
+    // Función para mostrar el texto estilo máquina de escribir
+    const text = "Te amo";
+    const textElement = document.getElementById("text");
+    let index = 0;
+
+    function typeWriter() {
+      if (index < text.length) {
+        textElement.textContent += text.charAt(index);
+        index++;
+        setTimeout(typeWriter, 150); // Velocidad de escritura
+      }
+    }
+
+    // Iniciar animación y texto
+    typeWriter();
+    animateSunflower();
+  </script>
+</body>
+</html>
+
